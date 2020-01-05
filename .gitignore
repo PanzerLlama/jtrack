@@ -14,3 +14,16 @@
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+
+.idea/.gitignore
+.idea/deployment.xml
+.idea/jtrack.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/php.xml
+.idea/symfony2.xml
+.idea/vcs.xml
+node_modules/
+package-lock.json
+symfony.lock
+composer.lock

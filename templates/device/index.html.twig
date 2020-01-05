@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+{% import "macros/user.html.twig" as userMacro %}
+
+{% block title %}Urządzenia{% endblock %}
+{% block body %}
+<div class="bg-gray-100">
+    <div class="container mx-auto py-8">
+        <div class="text-right">
+            <a href="{{ path('device_new') }}" class="btn">Rejestruj urządzenie</a>
+        </div>
+    </div>
+</div>
+<div class="container mx-auto py-8">
+    {% if pagination.count %}
+        <table class="w-full sm:bg-white overflow-hidden sm:shadow-lg my-5">
+            <thead class="text-white">
+            <tr class="bg-teal-600">
+                <th class="p-2 text-left">Urządzenie</th>
+                <th class="p-2 text-left"></th>
+                <th class="p-2 text-left">Data rejestracji</th>
+                <th class="p-2 text-left">Tracker</th>
+                <th class="p-2 text-left">Opcje</th>
+            </tr>
+            </thead>
+            <tbody class="flex-1 sm:flex-none">
+            {% for e in pagination %}
+                <tr>
+                    <td class="border-grey-light border hover:bg-gray-100 p-3"><strong>{{ e.name }}</strong> ({{ e.id }})</td>
+                    <td class="border-grey-light border hover:bg-gray-100 p-3 text-center"><i class="fa fa-circle {% if e.enabled %}text-green-500{% else %}text-gray-200{% endif %}"></i></td>
+                    <td class="border-grey-light border hover:bg-gray-100 p-3 text-center">{{ e.created.format('Y/m/d') }}</td>
+                    <td class="border-grey-light border hover:bg-gray-100 p-3 text-center">{{ e.trackerUid }}</td>
+                    <td class="border-grey-light border hover:bg-gray-100 p-3">
+                        <a href="{{ path('device_edit', { id: e.id }) }}" class="btn text-center">Edycja</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Brak zarejestrowanych urządzeń.</p>
+    {% endif %}
+</div>
+{% endblock %}

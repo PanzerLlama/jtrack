@@ -1,0 +1,11 @@
+{% for type, messages in app.session.flashbag.all() %}
+{% if messages %}
+<div class="{{ type }}">
+    <div class="container mx-auto py-4">
+        {% for e in messages %}
+            <p>{{ e }}</p>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endfor %}

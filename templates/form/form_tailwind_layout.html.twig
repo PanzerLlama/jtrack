@@ -1,0 +1,94 @@
+{% use "form_div_layout.html.twig" %}
+
+{% block text_widget %}
+    {%- set type = type|default('text') -%}
+    {{ block('form_widget_simple') }}
+{% endblock %}
+
+{%- block button_widget -%}
+    {%- if label is empty -%}
+        {%- if label_format is not empty -%}
+            {% set label = label_format|replace({
+                '%name%': name,
+                '%id%': id,
+            }) %}
+        {%- elseif label is same as(false) -%}
+            {% set translation_domain = false %}
+        {%- else -%}
+            {% set label = name|humanize %}
+        {%- endif -%}
+    {%- endif -%}
+    <button type="{{ type|default('button') }}" {{ block('button_attributes') }}>{{ translation_domain is same as(false) ? label : label|trans({}, translation_domain) }}</button>
+{%- endblock button_widget -%}
+
+{%- block checkbox_widget -%}
+    <label class="custom-label">
+        <div class="bg-white border-2 w-6 h-6 p-1 flex justify-center items-center mr-2">
+            <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}" class="hidden"{% endif %}{% if checked %} checked="checked"{% endif %} />
+            <svg class="hidden w-4 h-4 text-green-600 pointer-events-none" viewBox="0 0 172 172"><g fill="none" stroke-width="none" stroke-miterlimit="10" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode:normal"><path d="M0 172V0h172v172z"/><path d="M145.433 37.933L64.5 118.8658 33.7337 88.0996l-10.134 10.1341L64.5 139.1341l91.067-91.067z" fill="currentColor" stroke-width="1"/></g></svg>
+        </div>
+        <span class="select-none"> {{ label|trans({}, translation_domain) }}</span>
+    </label>
+{#  <label for="{{ id }}" class="text-gray-700 text-sm"><input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} /> {{ label|trans({}, translation_domain) }}</label>#}
+{%- endblock checkbox_widget -%}
+
+{%- block form_widget_simple -%}
+    <input type="{{ type }}"
+           id="{{ id}}"
+           name={{ full_name }}
+           class="{{ block('input_class') }}"
+           {% if value is not empty %}value="{{ value }}" {% endif %}
+            {% if required is defined %}required {% endif %}/>
+{%- endblock form_widget_simple -%}
+
+{% block form_label -%}
+    {%- if label is same as(false) -%}
+        <div></div>
+    {%- else -%}
+        {%- set label_attr = label_attr|merge({class: (label_attr.class|default(''))|trim}) -%}
+        <div>
+            {{- parent() -}}
+        </div>
+    {%- endif -%}
+{%- endblock form_label %}
+
+{%- block form_row -%}
+    {%- set widget_attr = {} -%}
+    <div class="mb-6">
+        <div class="x-mb-2">
+            {{- form_label(form) -}}
+            <div class="mb-2">
+                {{- form_widget(form, widget_attr) -}}
+                {{- form_help(form) -}}
+            </div>
+        </div>
+        {{ form_errors(form)  }}
+    </div>
+{%- endblock form_row %}
+
+{%- block checkbox_row -%}
+    {%- set widget_attr = {} -%}
+    <div class="mb-6">
+        <div class="mb-2">
+            {{- form_widget(form, widget_attr) -}}
+            {{- form_help(form) -}}
+        </div>
+        {{ form_errors(form)  }}
+    </div>
+{%- endblock checkbox_row %}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <div class="md:flex md:items-center mb-4">
+            <ul class="list-reset">
+                {%- for error in errors -%}
+                    <li class="text-red text-xs italic">{{ error.message }}</li>
+                {%- endfor -%}
+            </ul>
+        </div>
+    {%- endif -%}
+{%- endblock form_errors -%}
+
+{% block input_class -%}
+    {% if form.vars.errors|length %}border-red border-1{% endif %}
+{% endblock input_class -%}

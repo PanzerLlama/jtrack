@@ -1,0 +1,41 @@
+{# default Sliding pagination control implementation #}
+
+{% if pageCount > 1 %}
+    <ul class="flex pl-0 list-none rounded my-2">
+
+        {% if first is defined and current != first %}
+        <li class="relative block py-2 px-3 mr-2 leading-tight bg-white border border-gray-300 text-blue-700 ml-0 rounded-l hover:bg-gray-200">
+            <a href="{{ path(route, query|merge({(pageParameterName): first})) }}"><i class="fas fa-fast-backward"></i></a>
+        </li>
+        {% endif %}
+
+        {% if previous is defined %}
+            <li class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 border-r-0 ml-0 rounded-l hover:bg-gray-200">
+                <a href="{{ path(route, query|merge({(pageParameterName): previous})) }}"><i class="fas fa-step-backward"></i></a>
+            </li>
+        {% endif %}
+
+        {% for page in pagesInRange %}
+        <li class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 border-r-0 hover:bg-gray-200">
+            {% if page != current %}
+                <a href="{{ path(route, query|merge({(pageParameterName): page})) }}">{{ page }}</a>
+            {% else %}
+                <span>{{ page }}</span>
+            {% endif %}
+        </li>
+        {% endfor %}
+
+        {% if next is defined %}
+        <li class="relative block py-2 px-3 leading-tight bg-white border border-gray-300 text-blue-700 rounded-r hover:bg-gray-200">
+            <a href="{{ path(route, query|merge({(pageParameterName): next})) }}"><i class="fas fa-step-forward"></i></a>
+        </li>
+        {% endif %}
+
+        {% if last is defined and current != last %}
+        <li class="relative block py-2 px-3 ml-2 leading-tight bg-white border border-gray-300 text-blue-700 rounded-r hover:bg-gray-200">
+            <a href="{{ path(route, query|merge({(pageParameterName): last})) }}"><i class="fas fa-fast-forward"></i></a>
+        </li>
+        {% endif %}
+
+    </ul>
+{% endif %}

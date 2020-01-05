@@ -1,0 +1,7 @@
+{% macro roles(user) %}
+    {% for role in user.roles %}
+        {% if role == 'ROLE_ADMIN' %}
+            <div class="ui red horizontal label">Administrator systemu</div>
+        {% endif %}
+    {% endfor %}
+{% endmacro %}

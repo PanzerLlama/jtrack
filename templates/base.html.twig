@@ -1,12 +1,29 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
-    </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{ title|default('JTrack') }}</title>
+    <link rel="stylesheet" href="{{ asset('css/site.css') }}">
+    <link rel="stylesheet" href="{{ asset('fa/css/font-awesome.min.css') }}">
+</head>
+<body class="flex flex-col h-full">
+    {{ include('navigation.html.twig') }}
+    {{ include('breadcrumbs.html.twig') }}
+    <div id="content" class="flex-1">
+    {{ include('flash_bag.html.twig') }}
+    {% block body %}{% endblock %}
+    </div>
+    <footer class="w-full text-left bg-gray-300 p-4 pin-b">
+        JTrack {{ app_version }}
+    </footer>
+</body>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#toggler').change(function () {
+      $('.toggle').prop('checked', this.checked);
+    });
+  });
+</script>
 </html>

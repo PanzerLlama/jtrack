@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<div class="container mx-auto py-8">
+    {% if device.id is defined %}
+        {{ include('page_header.html.twig', { title: 'Edycja urządzenia ' ~ device.name }) }}
+    {% else %}
+        {{ include('page_header.html.twig', { title: 'Rejestracja nowego urządzenia'}) }}
+    {% endif %}
+    {% include('form/generic.html.twig') %}
+</div>
+{% endblock %}

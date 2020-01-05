@@ -3,3 +3,7 @@ twig:
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
     exception_controller: null
+    form_themes:
+        - 'form/form_tailwind_layout.html.twig'
+    globals:
+        app_version: '%env(APP_VERSION)%'

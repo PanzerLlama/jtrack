@@ -1,0 +1,1 @@
+ npx tailwind build assets/styles/tailwind.pcss -o public/css/site.css

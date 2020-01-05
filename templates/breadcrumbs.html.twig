@@ -1,0 +1,18 @@
+{% if breadcrumbs is defined %}
+<div class="bg-teal-600">
+    <div class="container mx-auto p-2 py-3">
+        <nav class="bg-grey-light rounded font-sans text-sm w-full">
+            <ol class="list-reset flex text-teal-400">
+                {% for e in breadcrumbs.elements %}
+                    {% if not loop.last %}
+                        <li><a href="{{ e.url }}" class="text-gray-200 font-bold">{{ e.label }}</a></li>
+                        <li><span class="mx-2">/</span></li>
+                    {% else %}
+                        <li class="text-gray-100">{{ e.label }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endif %}
