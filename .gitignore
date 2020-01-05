@@ -25,5 +25,5 @@
 .idea/vcs.xml
 node_modules/
 package-lock.json
-symfony.lock
-composer.lock
+!/symfony.lock
+!/composer.lock
