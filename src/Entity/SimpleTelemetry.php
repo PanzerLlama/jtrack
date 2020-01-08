@@ -9,13 +9,16 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Annotations\Projection;
 use App\Entity\Fields\CreatedField;
+use App\Interfaces\TelemetryInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity()
  */
-class SimpleTelemetry
+class SimpleTelemetry implements TelemetryInterface
 {
     use CreatedField;
 
@@ -30,18 +33,33 @@ class SimpleTelemetry
     /**
      * @var float|null
      * @ORM\Column(type="float", nullable=true)
+     * @Assert\Range(
+     *      min = -90,
+     *      max = 90
+     *)
+     * @Projection()
      */
     private $latitude;
 
     /**
      * @var float|null
      * @ORM\Column(type="float", nullable=true)
+     * @Assert\Range(
+     *      min = -180,
+     *      max = 180
+     * )
+     * @Projection()
      */
     private $longitude;
 
     /**
      * @var integer|null
      * @ORM\Column(type="integer", nullable=true)
+     * @Assert\Range(
+     *      min = 0,
+     *      max = 100
+     * )
+     * @Projection()
      */
     private $humidity;
 

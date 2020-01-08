@@ -39,6 +39,15 @@ class Device
     private $name;
 
     /**
+     * @var string
+     * @ORM\Column(type="string", length=255)
+     * @Projection()
+     *
+     * Used for signing the telemetry messages
+     */
+    private $secret;
+
+    /**
      * @var string|null
      * @ORM\Column(type="string", length=32, nullable=true)
      * @Projection()
@@ -83,6 +92,24 @@ class Device
     public function setName(string $name): Device
     {
         $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecret(): string
+    {
+        return $this->secret;
+    }
+
+    /**
+     * @param string $secret
+     * @return Device
+     */
+    public function setSecret(string $secret): Device
+    {
+        $this->secret = $secret;
         return $this;
     }
 

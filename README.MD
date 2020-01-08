@@ -1,7 +1,7 @@
 Jtrack
 ------
 
-This is a simple project that can be used to store and show some basic telemetry data from IoT devices (on a map).
+This is a simple project based on Symfony 4.4 that can be used to store and show some basic telemetry data from IoT devices (on a map).
 The point was to quickly put something together that would be simple/functional w/o lots of dependencies and "big" 
 bundles.
 
