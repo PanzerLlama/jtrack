@@ -37,7 +37,7 @@ class SimpleTelemetry implements TelemetryInterface
      *      min = -90,
      *      max = 90
      *)
-     * @Projection()
+     * @Projection(type="float")
      */
     private $latitude;
 
@@ -48,7 +48,7 @@ class SimpleTelemetry implements TelemetryInterface
      *      min = -180,
      *      max = 180
      * )
-     * @Projection()
+     * @Projection(type="float")
      */
     private $longitude;
 
@@ -59,7 +59,7 @@ class SimpleTelemetry implements TelemetryInterface
      *      min = 0,
      *      max = 100
      * )
-     * @Projection()
+     * @Projection(type="integer")
      */
     private $humidity;
 

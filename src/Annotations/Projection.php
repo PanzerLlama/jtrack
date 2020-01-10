@@ -18,9 +18,32 @@ use Doctrine\Common\Annotations\Annotation;
 class Projection
 {
     /**
+     * @var string
+     */
+    public $type;
+
+    /**
      * @var array
      */
     public $groups = [];
+
+    /**
+     * @return string|null
+     */
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string|null $type
+     * @return Projection
+     */
+    public function setType(?string $type): Projection
+    {
+        $this->type = $type;
+        return $this;
+    }
 
     /**
      * @return array

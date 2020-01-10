@@ -10,8 +10,11 @@ declare(strict_types=1);
 namespace App\Factory;
 
 
+use App\Exception\InvalidTelemetryException;
 use App\Interfaces\TelemetryInterface;
 use App\Service\ProjectionService;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TelemetryCreator
 {
@@ -20,16 +23,41 @@ class TelemetryCreator
      */
     private $projectionService;
 
-    public function __construct(ProjectionService $projectionService)
+    /**
+     * @var ValidatorInterface
+     */
+    private $validator;
+
+    public function __construct(ProjectionService $projectionService, ValidatorInterface $validator)
     {
-        $this->projectionService = $projectionService;
+        $this->projectionService    = $projectionService;
+        $this->validator            = $validator;
     }
 
-    public function create(TelemetryInterface $subject, array $data)
+    /**
+     * @param TelemetryInterface $subject
+     * @param Request $request
+     * @return TelemetryInterface
+     * @throws InvalidTelemetryException
+     */
+    public function create(TelemetryInterface $subject, Request $request)
     {
         $projection = $this->projectionService->getProjection($subject);
 
-        var_dump($projection);
+        foreach ($projection as $k => $v) {
+            if (null !== $value = $request->get($k)) {
+                $projection[$k] = $value;
+            }
+        }
 
+        $this->projectionService->updateModelFromProjection($subject, $projection);
+
+        $errors = $this->validator->validate($subject);
+
+        if (count($errors)) {
+            throw new InvalidTelemetryException((string) $errors);
+        }
+
+        return $subject;
     }
 }

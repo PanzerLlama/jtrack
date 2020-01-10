@@ -59,6 +59,8 @@ class ProjectionService
         foreach ($reflectionClass->getProperties() as $property) {
 
             $propertyName = $property->getName();
+
+            /** @var Projection $annotation */
             $annotation = $reader->getPropertyAnnotation(
                 $property,
                 Projection::class
@@ -67,6 +69,13 @@ class ProjectionService
             if ($annotation) {
                 $setter = 'set'.ucfirst($propertyName);
                 if (isset($projection[$propertyName])) {
+
+                    if ($annotation->getType() === 'integer') {
+                        $projection[$propertyName] = (integer) $projection[$propertyName];
+                    } elseif ($annotation->getType() === 'float') {
+                        $projection[$propertyName] = (float) $projection[$propertyName];
+                    }
+
                     $subject->$setter($projection[$propertyName]);
                 }
             }

@@ -12,10 +12,12 @@ namespace App\Controller;
 
 use App\Entity\Device;
 use App\Entity\SimpleTelemetry;
+use App\Exception\InvalidTelemetryException;
 use App\Factory\TelemetryCreator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -32,23 +34,16 @@ class TelemetryEndpointController extends AbstractController
      */
     public function TelemetryEndpoint(Request $request, TelemetryCreator $creator, Device $device, string $controlHash)
     {
-        $queryString = $request->query->get('name_query');
-
-        echo 'queryString: '.$queryString;
-
-        $creator->create(new SimpleTelemetry($device), [
-            'latitude' => 10.0988,
-            'longitude' => 788.8998,
-            'humidity' => 38
-        ]);
-
-        exit;
-
-        if (md5(sprintf('%s:%s', $device->getSecret(), $queryString)) !== $controlHash) {
+        if (md5(sprintf('%s:%s', $device->getSecret(), $request->getQueryString())) !== $controlHash) {
             throw new HttpException(400, 'Invalid signature.');
         }
 
+        try {
+            $telemetry = $creator->create(new SimpleTelemetry($device), $request);
+        } catch (InvalidTelemetryException $e) {
+            return new Response('ERROR', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
-
+        return new Response('OK', Response::HTTP_OK);
     }
 }
