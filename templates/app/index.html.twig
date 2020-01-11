@@ -39,6 +39,8 @@
 
   map.addLayer(vectorLayer);
 
+  var extent = map.getView().calculateExtent(map.getSize());
+  extent = ol.proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
 
   var devices = $('#devices');
 
@@ -84,22 +86,31 @@
 
       t.fadeOut('fast', function () {
         t.remove();
-        var html = '<div class="p-2 bg-gray-100 border-b-2" id="t-device-' + data.device.id + '">\n' +
+        var html = '<div class="p-2 bg-gray-100 border-b-2 cursor-pointer" id="t-device-' + data.device.id + '">\n' +
                 '<div><strong class="t-name">' + data.device.name + '</strong><div class="inline-block float-right m-1 w-4 h-4 rounded-full" style="background-color: ' + data.device.color + ';">&nbsp;</div></div>\n' +
                 '<div class="pt-1"><small class="t-created">'+ data.created + '</small></div>\n' +
                 '<div class="pt-2">Wilgotność: <span class="t-humidity">' + data.humidity + '</span>%, Temperatura: <span class="t-temperature">' + data.temperature + '</span>&deg;C</div>\n' +
                 '</div>';
         $(html).prependTo(devices);
+
+        $('#t-device-' + data.device.id).click(function() {
+          map.getView().setCenter(ol.proj.transform([data.longitude, data.latitude], 'EPSG:4326', 'EPSG:3857'));
+        });
       });
 
     } else {
-      var html = '<div class="p-2 bg-gray-100 border-b-2" id="t-device-' + data.device.id + '">\n' +
+      var html = '<div class="p-2 bg-gray-100 border-b-2 cursor-pointer" id="t-device-' + data.device.id + '">\n' +
               '<div><strong class="t-name">' + data.device.name + '</strong><div class="inline-block float-right m-1 w-4 h-4 rounded-full" style="background-color: ' + data.device.color + ';">&nbsp;</div></div>\n' +
               '<div class="pt-1"><small class="t-created">'+ data.created + '</small></div>\n' +
               '<div class="pt-2">Wilgotność: <span class="t-humidity">' + data.humidity + '</span>%, Temperatura: <span class="t-temperature">' + data.temperature + '</span>&deg;C</div>\n' +
               '</div>';
       $(html).prependTo(devices);
+
+      $('#t-device-' + data.device.id).click(function() {
+        map.getView().setCenter(ol.proj.transform([data.longitude, data.latitude], 'EPSG:4326', 'EPSG:3857'));
+      });
     }
+
   }
 
 </script>
