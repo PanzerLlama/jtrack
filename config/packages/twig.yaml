@@ -7,3 +7,4 @@ twig:
         - 'form/form_tailwind_layout.html.twig'
     globals:
         app_version: '%env(APP_VERSION)%'
+        mercure_url: '%env(MERCURE_PUBLISH_URL)%'

@@ -13,6 +13,7 @@ use App\Annotations\Projection;
 use App\Entity\Fields\CreatedField;
 use App\Interfaces\TelemetryInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -38,6 +39,7 @@ class SimpleTelemetry implements TelemetryInterface
      *      max = 90
      *)
      * @Projection(type="float")
+     * @Groups({"Mercure"})
      */
     private $latitude;
 
@@ -49,6 +51,7 @@ class SimpleTelemetry implements TelemetryInterface
      *      max = 180
      * )
      * @Projection(type="float")
+     * @Groups({"Mercure"})
      */
     private $longitude;
 
@@ -60,6 +63,7 @@ class SimpleTelemetry implements TelemetryInterface
      *      max = 100
      * )
      * @Projection(type="integer")
+     * @Groups({"Mercure"})
      */
     private $humidity;
 
@@ -67,6 +71,7 @@ class SimpleTelemetry implements TelemetryInterface
      * @var Device
      * @ORM\ManyToOne(targetEntity="App\Entity\Device")
      * @ORM\JoinColumn(name="device_id", referencedColumnName="id")
+     * @Groups({"Mercure"})
      */
     private $device;
 

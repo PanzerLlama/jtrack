@@ -14,6 +14,7 @@ use App\Annotations\Projection;
 use App\Entity\Fields\CreatedField;
 use App\Entity\Fields\EnabledField;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity()
@@ -28,6 +29,7 @@ class Device
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"Mercure"})
      */
     private $id;
 
@@ -35,6 +37,7 @@ class Device
      * @var string
      * @ORM\Column(type="string", length=255)
      * @Projection()
+     * @Groups({"Mercure"})
      */
     private $name;
 

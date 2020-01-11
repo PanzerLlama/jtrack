@@ -6,6 +6,7 @@
     <title>{{ title|default('JTrack') }}</title>
     <link rel="stylesheet" href="{{ asset('css/site.css') }}">
     <link rel="stylesheet" href="{{ asset('fa/css/font-awesome.min.css') }}">
+    {% block css %}{% endblock %}
 </head>
 <body class="flex flex-col h-full">
     {{ include('navigation.html.twig') }}
@@ -14,9 +15,6 @@
     {{ include('flash_bag.html.twig') }}
     {% block body %}{% endblock %}
     </div>
-    <footer class="w-full text-left bg-gray-300 p-4 pin-b">
-        JTrack {{ app_version }}
-    </footer>
 </body>
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
 <script>
@@ -26,4 +24,5 @@
     });
   });
 </script>
+{% block js %}{% endblock %}
 </html>

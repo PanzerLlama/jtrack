@@ -21,6 +21,8 @@ final class DeviceEditType extends AbstractType
             'label'         => 'Nazwa'
         ])->add('trackerUid', TextType::class, [
             'label'         => 'Identyfikator trackera'
+        ])->add('secret', TextType::class, [
+            'label'         => 'Sekret'
         ])->add('enabled', CheckboxType::class,[
             'label'     => 'urządzenie jest aktywne',
             'required'  => false

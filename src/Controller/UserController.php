@@ -31,6 +31,7 @@ class UserController extends BaseController
 {
     public function _init()
     {
+        $this->addBreadcrumb($this->generateUrl('app_index'), 'Strona główna');
         $this->addBreadcrumb($this->generateUrl('user'), 'Użytkownicy');
     }
 

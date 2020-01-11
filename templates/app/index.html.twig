@@ -1,6 +1,71 @@
 {% extends 'base.html.twig' %}
+{% block css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.1.1/css/ol.css" type="text/css">
+{% endblock %}
+{% block js %}
+<script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.1.1/build/ol.js"></script>
+<script type="text/javascript">
+
+  const eventSource = new EventSource('{{ mercure_url }}?topic=' + encodeURIComponent('/telemetry/recent'));
+  eventSource.onmessage = event => {
+    // Will be called every time an update is published by the server
+    console.log(JSON.parse(event.data));
+  };
+
+  var map = new ol.Map({
+    target: 'map',
+    layers: [
+      new ol.layer.Tile({
+        source: new ol.source.OSM()
+      })
+    ],
+    view: new ol.View({
+      center: ol.proj.fromLonLat([20, 52]),
+      zoom: 7
+    })
+  });
+
+  var features = [];
+
+  var longitude = 20;
+  var latitude = 53;
+
+  var iconFeature = new ol.Feature({
+    geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], 'EPSG:4326', 'EPSG:3857'))
+  });
+
+  var iconStyle = new ol.style.Style({
+    image: new ol.style.Icon(({
+      anchor: [0.5, 46],
+      anchorXUnits: 'fraction',
+      anchorYUnits: 'pixels',
+      opacity: 0.75,
+      src: '{{ asset('images/marker.png') }}'
+    }))
+  });
+
+  iconFeature.setStyle(iconStyle);
+  features.push(iconFeature);
+
+  var vectorSource = new ol.source.Vector({
+    features: features      //add an array of features
+    //,style: iconStyle     //to set the style for all your features...
+  });
+
+  var vectorLayer = new ol.layer.Vector({
+    source: vectorSource
+  });
+  map.addLayer(vectorLayer);
+
+</script>
+{% endblock %}
 {% block body %}
-<div class="container mx-auto py-8">
-<h1>Oink</h1>
+<div class="flex h-full">
+    <div class="w-3/4 h-full">
+        <div id="map" class="map h-full"></div>
+    </div>
+    <div class="w-1/4 py-5">
+        Urządzenia
+    </div>
 </div>
 {% endblock %}
