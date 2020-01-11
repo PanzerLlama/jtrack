@@ -8,8 +8,9 @@
 
   const eventSource = new EventSource('{{ mercure_url }}?topic=' + encodeURIComponent('/telemetry/recent'));
   eventSource.onmessage = event => {
-    // Will be called every time an update is published by the server
-    console.log(JSON.parse(event.data));
+    //console.log(JSON.parse(event.data));
+    updateDeviceList(JSON.parse(event.data));
+
   };
 
   var map = new ol.Map({
@@ -25,37 +26,81 @@
     })
   });
 
+  var markers = [];
   var features = [];
 
-  var longitude = 20;
-  var latitude = 53;
-
-  var iconFeature = new ol.Feature({
-    geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], 'EPSG:4326', 'EPSG:3857'))
-  });
-
-  var iconStyle = new ol.style.Style({
-    image: new ol.style.Icon(({
-      anchor: [0.5, 46],
-      anchorXUnits: 'fraction',
-      anchorYUnits: 'pixels',
-      opacity: 0.75,
-      src: '{{ asset('images/marker.png') }}'
-    }))
-  });
-
-  iconFeature.setStyle(iconStyle);
-  features.push(iconFeature);
-
   var vectorSource = new ol.source.Vector({
-    features: features      //add an array of features
-    //,style: iconStyle     //to set the style for all your features...
+    features: features
   });
 
   var vectorLayer = new ol.layer.Vector({
     source: vectorSource
   });
+
   map.addLayer(vectorLayer);
+
+
+  var devices = $('#devices');
+
+  function addMarker(deviceId, color, latitude, longitude, icon) {
+
+    console.log('addMarker', deviceId, color, latitude, longitude);
+
+    if (typeof(markers[deviceId]) !== 'undefined') {
+        markers[deviceId].setGeometry(new ol.geom.Point(ol.proj.transform([longitude, latitude], 'EPSG:4326', 'EPSG:3857')));
+    } else {
+
+      var iconStyle = new ol.style.Style({
+        image: new ol.style.Icon(({
+          color: color,
+          anchor: [0.5, 46],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'pixels',
+          opacity: 1,
+          src: '{{ asset('images/marker.png') }}'
+        }))
+      });
+
+      markers[deviceId] = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.transform([longitude, latitude], 'EPSG:4326', 'EPSG:3857'))
+      });
+
+      markers[deviceId].setStyle(iconStyle);
+      features.push(markers[deviceId]);
+
+      vectorSource.addFeatures([markers[deviceId]]);
+    }
+
+  }
+
+  function updateDeviceList(data) {
+
+    console.log('updateDeviceList:', data);
+    var t = $('#t-device-' + data.device.id);
+
+    addMarker(data.device.id, data.device.decimalColor, data.latitude, data.longitude);
+
+    if (t.length) {
+
+      t.fadeOut('fast', function () {
+        t.remove();
+        var html = '<div class="p-2 bg-gray-100 border-b-2" id="t-device-' + data.device.id + '">\n' +
+                '<div><strong class="t-name">' + data.device.name + '</strong><div class="inline-block float-right m-1 w-4 h-4 rounded-full" style="background-color: ' + data.device.color + ';">&nbsp;</div></div>\n' +
+                '<div class="pt-1"><small class="t-created">'+ data.created + '</small></div>\n' +
+                '<div class="pt-2">Wilgotność: <span class="t-humidity">' + data.humidity + '</span>%, Temperatura: <span class="t-temperature">' + data.temperature + '</span>&deg;C</div>\n' +
+                '</div>';
+        $(html).prependTo(devices);
+      });
+
+    } else {
+      var html = '<div class="p-2 bg-gray-100 border-b-2" id="t-device-' + data.device.id + '">\n' +
+              '<div><strong class="t-name">' + data.device.name + '</strong><div class="inline-block float-right m-1 w-4 h-4 rounded-full" style="background-color: ' + data.device.color + ';">&nbsp;</div></div>\n' +
+              '<div class="pt-1"><small class="t-created">'+ data.created + '</small></div>\n' +
+              '<div class="pt-2">Wilgotność: <span class="t-humidity">' + data.humidity + '</span>%, Temperatura: <span class="t-temperature">' + data.temperature + '</span>&deg;C</div>\n' +
+              '</div>';
+      $(html).prependTo(devices);
+    }
+  }
 
 </script>
 {% endblock %}
@@ -64,8 +109,10 @@
     <div class="w-3/4 h-full">
         <div id="map" class="map h-full"></div>
     </div>
-    <div class="w-1/4 py-5">
-        Urządzenia
+    <div class="w-1/4">
+      <h5 class="p-4 border-b-2">Urządzenia</h5>
+      <div id="devices">
+      </div>
     </div>
 </div>
 {% endblock %}

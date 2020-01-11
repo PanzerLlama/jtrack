@@ -51,6 +51,14 @@ class Device
     private $secret;
 
     /**
+     * @var string
+     * @ORM\Column(type="string", length=7)
+     * @Projection()
+     * @Groups({"Mercure"})
+     */
+    private $color = '#707070';
+
+    /**
      * @var string|null
      * @ORM\Column(type="string", length=32, nullable=true)
      * @Projection()
@@ -117,6 +125,24 @@ class Device
     }
 
     /**
+     * @return string
+     */
+    public function getColor(): string
+    {
+        return $this->color;
+    }
+
+    /**
+     * @param string $color
+     * @return Device
+     */
+    public function setColor(string $color): Device
+    {
+        $this->color = $color;
+        return $this;
+    }
+
+    /**
      * @return string|null
      */
     public function getTrackerUid(): ?string
@@ -132,5 +158,14 @@ class Device
     {
         $this->trackerUid = $trackerUid;
         return $this;
+    }
+
+    /**
+     * @return array|null
+     * @Groups({"Mercure"})
+     */
+    public function getDecimalColor(): ?array
+    {
+        return [hexdec(substr($this->color,1,2)), hexdec(substr($this->color,3,2)), hexdec(substr($this->color,5,2))];
     }
 }

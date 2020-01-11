@@ -68,6 +68,18 @@ class SimpleTelemetry implements TelemetryInterface
     private $humidity;
 
     /**
+     * @var integer|null
+     * @ORM\Column(type="integer", nullable=true)
+     * @Assert\Range(
+     *      min = -50,
+     *      max = 100
+     * )
+     * @Projection(type="integer")
+     * @Groups({"Mercure"})
+     */
+    private $temperature;
+
+    /**
      * @var Device
      * @ORM\ManyToOne(targetEntity="App\Entity\Device")
      * @ORM\JoinColumn(name="device_id", referencedColumnName="id")
@@ -104,7 +116,7 @@ class SimpleTelemetry implements TelemetryInterface
      */
     public function getLatitude(): ?float
     {
-        return $this->latitude;
+        return $this->latitude + (rand(0,100)/1000);
     }
 
     /**
@@ -122,7 +134,7 @@ class SimpleTelemetry implements TelemetryInterface
      */
     public function getLongitude(): ?float
     {
-        return $this->longitude;
+        return $this->longitude + (rand(0,100)/1000);
     }
 
     /**
@@ -150,6 +162,24 @@ class SimpleTelemetry implements TelemetryInterface
     public function setHumidity(?int $humidity): SimpleTelemetry
     {
         $this->humidity = $humidity;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTemperature(): ?int
+    {
+        return $this->temperature;
+    }
+
+    /**
+     * @param int|null $temperature
+     * @return SimpleTelemetry
+     */
+    public function setTemperature(?int $temperature): SimpleTelemetry
+    {
+        $this->temperature = $temperature;
         return $this;
     }
 

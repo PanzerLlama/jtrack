@@ -18,11 +18,13 @@ final class DeviceEditType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('name', TextType::class, [
-            'label'         => 'Nazwa'
+            'label'     => 'Nazwa'
         ])->add('trackerUid', TextType::class, [
-            'label'         => 'Identyfikator trackera'
+            'label'     => 'Identyfikator trackera',
+        ])->add('color', TextType::class, [
+            'label'     => 'Kolor ikony (mapa)'
         ])->add('secret', TextType::class, [
-            'label'         => 'Sekret'
+            'label'     => 'Sekret'
         ])->add('enabled', CheckboxType::class,[
             'label'     => 'urządzenie jest aktywne',
             'required'  => false
