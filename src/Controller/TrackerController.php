@@ -10,11 +10,12 @@ namespace App\Controller;
 
 
 use App\Entity\Device;
+use App\Entity\Tracker;
 use App\Form\Device\DeviceEditType;
+use App\Form\Tracker\TrackerEditType;
 use App\Service\ProjectionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use ProxyManager\Generator\Util\ClassGeneratorUtils;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -25,25 +26,25 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
- * @Route("/device")
+ * @Route("/tracker")
  */
-class DeviceController extends BaseController
+class TrackerController extends BaseController
 {
     public function _init()
     {
         $this->addBreadcrumb($this->generateUrl('app_index'), 'Strona główna');
-        $this->addBreadcrumb($this->generateUrl('device'), 'Urządzenia');
+        $this->addBreadcrumb($this->generateUrl('tracker'), 'Trackery');
     }
 
     /**
-     * @Route("", name="device")
+     * @Route("", name="tracker")
      * @Template()
      */
     public function index(Request $request, EntityManagerInterface $entityManager, PaginatorInterface $paginator)
     {
         $queryBuilder = $entityManager->createQueryBuilder();
 
-        $queryBuilder->select('d')->from(Device::class, 'd');
+        $queryBuilder->select('t')->from(Tracker::class, 't');
 
         $pagination = $paginator->paginate($queryBuilder->getQuery(), $request->query->getInt('page', 1), 20);
 
@@ -54,7 +55,7 @@ class DeviceController extends BaseController
     }
 
     /**
-     * @Route("/new", name="device_new", methods="GET|POST")
+     * @Route("/new", name="tracker_new", methods="GET|POST")
      */
     public function new(
         Request $request,
@@ -64,21 +65,21 @@ class DeviceController extends BaseController
         ProjectionService $projectionService
     ): Response
     {
-        $this->addBreadcrumb($this->generateUrl('user_new'), 'Rejestruj nowe urządzenie');
+        $this->addBreadcrumb($this->generateUrl('user_new'), 'Rejestruj nowy tracker');
 
-        $form = $formFactory->createNamed('', DeviceEditType::class, [
+        $form = $formFactory->createNamed('', TrackerEditType::class, [
             'name'          => '',
-            'trackerUid'    => '',
+            'uid'           => '',
+            'secret'        => '',
+            'flagEmulated'  => false,
             'enabled'       => true
-        ], [
-           'entityManager' => $entityManager
         ]);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $entity = new Device();
+            $entity = new Tracker();
 
             $data = $form->getData();
 
@@ -87,12 +88,12 @@ class DeviceController extends BaseController
             $entityManager->persist($entity);
             $entityManager->flush();
 
-            $flashBag->add('success', sprintf('Utworzono urządzenie "%s".', $entity->getName()));
+            $flashBag->add('success', sprintf('Utworzono tracker "%s".', $entity->getName()));
 
-            return $this->redirectToRoute('device');
+            return $this->redirectToRoute('tracker');
         }
 
-        return $this->render('device/edit.html.twig', [
+        return $this->render('tracker/edit.html.twig', [
             'entity'        => null,
             'breadcrumbs'   => $this->getBreadcrumbs(),
             'form'          => $form->createView(),
@@ -100,30 +101,22 @@ class DeviceController extends BaseController
     }
 
     /**
-     * @Route("/{id}", name="device_edit", requirements={"id"="^[a-f0-9\-]+$"}, methods="GET|POST")
-     * @ParamConverter("device")
+     * @Route("/{id}", name="tracker_edit", requirements={"id"="^[a-f0-9\-]+$"}, methods="GET|POST")
+     * @ParamConverter("tracker")
      */
     public function edit(
         Request $request,
         EntityManagerInterface $entityManager,
         FormFactoryInterface $formFactory,
         FlashBagInterface $flashBag,
+        UserPasswordEncoderInterface $passwordEncoder,
         ProjectionService $projectionService,
-        Device $entity
+        Tracker $entity
     ): Response
     {
-        $this->addBreadcrumb($this->generateUrl('device_edit', [
-            'id' => $entity->getId()
-        ]), sprintf('%s', $entity->getName()));
+        $this->addBreadcrumb($this->generateUrl('tracker_edit', ['id' => $entity->getId()]), sprintf('%s', $entity->getName()));
 
-        //echo get_class($entity->getTracker());
-        //echo $entityManager->getClassMetadata(get_class($entity))->getName();
-
-        //var_dump($projectionService->getProjection($entity));exit;
-
-        $form = $formFactory->createNamed('', DeviceEditType::class, $projectionService->getProjection($entity), [
-            'entityManager' => $entityManager
-        ]);
+        $form = $formFactory->createNamed('', Tracker::class, $projectionService->getProjection($entity));
 
         $form->handleRequest($request);
 
@@ -136,10 +129,10 @@ class DeviceController extends BaseController
 
             $flashBag->add('success', sprintf('Uaktualniono urządzenie "%s".', $entity->getName()));
 
-            return $this->redirectToRoute('device');
+            return $this->redirectToRoute('tracker');
         }
 
-        return $this->render('device/edit.html.twig', [
+        return $this->render('tracker/edit.html.twig', [
             'entity'        => $entity,
             'breadcrumbs'   => $this->getBreadcrumbs(),
             'form'          => $form->createView(),

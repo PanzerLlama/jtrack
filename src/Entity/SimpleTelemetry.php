@@ -33,7 +33,7 @@ class SimpleTelemetry implements TelemetryInterface
 
     /**
      * @var float|null
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="decimal", precision=10, scale=8, nullable=true)
      * @Assert\Range(
      *      min = -90,
      *      max = 90
@@ -45,7 +45,7 @@ class SimpleTelemetry implements TelemetryInterface
 
     /**
      * @var float|null
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="decimal", precision=11, scale=8, nullable=true)
      * @Assert\Range(
      *      min = -180,
      *      max = 180
@@ -56,8 +56,8 @@ class SimpleTelemetry implements TelemetryInterface
     private $longitude;
 
     /**
-     * @var integer|null
-     * @ORM\Column(type="integer", nullable=true)
+     * @var float|null
+     * @ORM\Column(type="decimal", precision=5, scale=2, nullable=true)
      * @Assert\Range(
      *      min = 0,
      *      max = 100
@@ -68,8 +68,8 @@ class SimpleTelemetry implements TelemetryInterface
     private $humidity;
 
     /**
-     * @var integer|null
-     * @ORM\Column(type="integer", nullable=true)
+     * @var float|null
+     * @ORM\Column(type="decimal", precision=5, scale=2, nullable=true)
      * @Assert\Range(
      *      min = -50,
      *      max = 100

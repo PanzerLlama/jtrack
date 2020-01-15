@@ -8,7 +8,10 @@
 
 namespace App\Entity\Fields;
 
+use App\Annotations\Projection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 trait UidField
 {
@@ -16,6 +19,9 @@ trait UidField
      * @var string
      *
      * @ORM\Column(type="string", length=32, nullable=false)
+     * Assert\Uniq
+     * @Groups({"Mercure"})
+     * @Projection()
      */
     private $uid;
 

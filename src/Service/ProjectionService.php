@@ -12,9 +12,20 @@ namespace App\Service;
 
 use App\Annotations\Projection;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ProjectionService
 {
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     /**
      * @param $subject
      * @param array $groups
@@ -22,11 +33,33 @@ class ProjectionService
      */
     public function getProjection($subject, array $groups = []): array
     {
+        return $this->project($subject, $groups);
+    }
+
+    /**
+     * @param $subject
+     * @param array $groups
+     * @return array
+     */
+    private function project($subject, array $groups = []): array
+    {
         $projection = [];
 
         $reader = new AnnotationReader();
 
-        $reflectionClass = new \ReflectionClass($subject);
+        if ($this->entityManager->getMetadataFactory()->isTransient($subject)) {
+            try {
+                $reflectionClass = new \ReflectionClass($this->entityManager->getClassMetadata(get_class($subject))->getName());
+            } catch (\ReflectionException $e) {
+                return [];
+            }
+        } else {
+            try {
+                $reflectionClass = new \ReflectionClass($class);
+            } catch (\ReflectionException $e) {
+                return [];
+            }
+        }
 
         foreach ($reflectionClass->getProperties() as $property) {
 
@@ -43,7 +76,13 @@ class ProjectionService
                     $getter = 'is'.ucfirst($propertyName);
                 }
 
-                $projection[$propertyName] = $subject->$getter();
+                $value = $subject->$getter();
+
+                if (is_object($value)) {
+                    $projection[$propertyName] = $this->getProjection($value, $groups);
+                } else {
+                    $projection[$propertyName] = $subject->$getter();
+                }
             }
         }
 
@@ -67,7 +106,9 @@ class ProjectionService
             );
 
             if ($annotation) {
+
                 $setter = 'set'.ucfirst($propertyName);
+
                 if (isset($projection[$propertyName])) {
 
                     if ($annotation->getType() === 'integer') {
@@ -77,6 +118,8 @@ class ProjectionService
                     }
 
                     $subject->$setter($projection[$propertyName]);
+                } else {
+                    $subject->$setter(null);
                 }
             }
         }

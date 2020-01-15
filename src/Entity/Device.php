@@ -43,15 +43,6 @@ class Device
 
     /**
      * @var string
-     * @ORM\Column(type="string", length=255)
-     * @Projection()
-     *
-     * Used for signing the telemetry messages
-     */
-    private $secret;
-
-    /**
-     * @var string
      * @ORM\Column(type="string", length=7)
      * @Projection()
      * @Groups({"Mercure"})
@@ -59,15 +50,20 @@ class Device
     private $color = '#707070';
 
     /**
-     * @var string|null
-     * @ORM\Column(type="string", length=32, nullable=true)
+     * @var Tracker|null
+     * @ORM\OneToOne(targetEntity="App\Entity\Tracker", inversedBy="device")
      * @Projection()
      */
-    private $trackerUid;
+    private $tracker;
 
     public function __construct()
     {
         $this->created = new \DateTime();
+    }
+
+    public function __toString()
+    {
+        return sprintf('%s (%s)', $this->getName(), $this->getId());
     }
 
     /**
@@ -109,24 +105,6 @@ class Device
     /**
      * @return string
      */
-    public function getSecret(): string
-    {
-        return $this->secret;
-    }
-
-    /**
-     * @param string $secret
-     * @return Device
-     */
-    public function setSecret(string $secret): Device
-    {
-        $this->secret = $secret;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
     public function getColor(): string
     {
         return $this->color;
@@ -143,20 +121,28 @@ class Device
     }
 
     /**
-     * @return string|null
+     * @return Tracker|null
      */
-    public function getTrackerUid(): ?string
+    public function getTracker(): ?Tracker
     {
-        return $this->trackerUid;
+        return $this->tracker;
     }
 
     /**
-     * @param string|null $trackerUid
+     * @param Tracker|null $tracker
      * @return Device
      */
-    public function setTrackerUid(?string $trackerUid): Device
+    public function setTracker(?Tracker $tracker): Device
     {
-        $this->trackerUid = $trackerUid;
+        if ($this->tracker) {
+            $this->tracker->setDevice(null);
+        }
+
+        $this->tracker = $tracker;
+
+        if ($tracker) {
+            $tracker->setDevice($tracker ? $this : null);
+        }
         return $this;
     }
 
