@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace App\Console;
 
 
+use App\Entity\Device;
 use App\Entity\SimpleTelemetry;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -17,7 +18,14 @@ use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Mercure\Update;
 
+/**
+ * Run from crontab or as service
+ *
+ * Class EmulatorCommand
+ * @package App\Console
+ */
 class EmulatorCommand extends Command
 {
     use LockableTrait;
@@ -49,9 +57,14 @@ class EmulatorCommand extends Command
         $this
             ->setName('emulator')
             ->setDescription('Generuje dane dla urządzeń z emulowanymi trackerami.')
-            ->addOption('frequency', null, InputOption::VALUE_OPTIONAL, 'Częstotliwość aktualizacji (w sekundach, domyślnie: 30).', 30);
+            ->addOption('frequency', null, InputOption::VALUE_OPTIONAL, 'Częstotliwość emulacji (w sekundach, domyślnie: 30).', 30);
     }
 
+    /**
+     * EmulatorCommand constructor.
+     * @param EntityManagerInterface $entityManager
+     * @param string|null $name
+     */
     public function __construct(EntityManagerInterface $entityManager, string $name = null)
     {
         $this->entityManager    = $entityManager;
@@ -69,15 +82,43 @@ class EmulatorCommand extends Command
         $queryBuilder = $this->entityManager->createQueryBuilder();
 
         $query = $queryBuilder
-            ->select('t')
-            ->from(SimpleTelemetry::class, 't')
-            ->leftJoin('t.device', 'td')
-            ->where($queryBuilder->expr()->gte('t.created', ':created'))
-            ->orderBy('t.created', 'ASC');
+            ->select('d')
+            ->from(Device::class, 'd')
+            ->leftJoin('d.tracker', 'dt')
+            ->where($queryBuilder->expr()->eq('dt.flagEmulated', 1))
+            ->orderBy('d.created', 'ASC');
 
-        $sleep = (int)($input->getOption('frequency') * 1000000);
+        if ($input->getOption('frequency')) {
+            $sleep = (int)($input->getOption('frequency') * 1000000);
+        }
 
+        if (isset($sleep)) {
 
+            do {
+                $output->writeln(sprintf('Fetching emulated devices.'));
+
+                /** @var Device $device */
+                foreach ($query->getQuery()->getResult() as $device) {
+                    $this->emulate($device);
+                }
+
+                $this->entityManager->flush();
+                $this->entityManager->clear();
+
+                usleep($sleep);
+
+            } while (true);
+        }
+
+        /** @var Device $device */
+        foreach ($query->getQuery()->getResult() as $device) {
+            $this->emulate($device);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    private function emulate(Device $device) {
 
     }
 
