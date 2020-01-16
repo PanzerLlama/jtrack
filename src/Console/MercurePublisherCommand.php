@@ -71,7 +71,10 @@ class MercurePublisherCommand extends Command
             ->from(SimpleTelemetry::class, 't')
             ->leftJoin('t.device', 'td')
             ->where($queryBuilder->expr()->gte('t.created', ':created'))
-            ->orderBy('t.created', 'ASC');
+            ->orderBy('t.created', 'ASC')
+            ->groupBy('t.device_id');
+
+        //echo $query->getQuery()->getSql(); exit;
 
         $sleep = (int) ($input->getOption('frequency') * 1000000);
 
@@ -79,7 +82,7 @@ class MercurePublisherCommand extends Command
 
             $stamp = new \DateTime();
 
-            $stamp->modify(sprintf('-%s minutes', $input->getOption('frequency')));
+            $stamp->modify(sprintf('-%s seconds', $input->getOption('frequency')));
 
             $query->setParameter('created', $stamp);
 

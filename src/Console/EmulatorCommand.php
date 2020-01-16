@@ -18,7 +18,6 @@ use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Mercure\Update;
 
 /**
  * Run from crontab or as service
@@ -36,19 +35,20 @@ class EmulatorCommand extends Command
     private $entityManager;
 
     /**
+     * Some random cities location, starting data for emulation
      * @var array
      */
     private $cities = [
-        'Białystok' => [53.13333, 23.16433],
-        'Chorzów'   => [50.30582, 18.9742],
-        'Gdańsk'    => [54.35205, 18.64637],
-        'Katowice'  => [50.25841, 19.02754],
-        'Kraków'    => [50.06143, 19.93658],
-        'Lublin'    => [51.25, 22.56667],
-        'Opole'     => [50.67211, 17.92533],
-        'Poznań'    => [52.40692, 16.92993],
-        'Warszawa'  => [52.22977, 21.01178],
-        'Wrocław'   => [51.1, 17.03333]
+        [53.13333, 23.16433],   // Białystok
+        [50.30582, 18.9742],    // Chorzów
+        [54.35205, 18.64637],   // Gdańsk
+        [50.25841, 19.02754],   // Katowice
+        [50.06143, 19.93658],   // Kraków
+        [51.25, 22.56667],      // Lublin
+        [50.67211, 17.92533],   // Opole
+        [52.40692, 16.92993],   // Poznań
+        [52.22977, 21.01178],   // Warszawa
+        [51.1, 17.03333]        // Wrocław
 
     ];
 
@@ -56,8 +56,8 @@ class EmulatorCommand extends Command
     {
         $this
             ->setName('emulator')
-            ->setDescription('Generuje dane dla urządzeń z emulowanymi trackerami.')
-            ->addOption('frequency', null, InputOption::VALUE_OPTIONAL, 'Częstotliwość emulacji (w sekundach, domyślnie: 30).', 30);
+            ->setDescription('Generates fake telemetry for devices with emulated trackers.')
+            ->addOption('frequency', null, InputOption::VALUE_OPTIONAL, 'Frequency of emulation in seconds (if the emulator runs in screen).');
     }
 
     /**
@@ -93,13 +93,12 @@ class EmulatorCommand extends Command
         }
 
         if (isset($sleep)) {
-
             do {
-                $output->writeln(sprintf('Fetching emulated devices.'));
+                $output->writeln(sprintf('Loading devices with emulated trackers.'));
 
                 /** @var Device $device */
                 foreach ($query->getQuery()->getResult() as $device) {
-                    $this->emulate($device);
+                    $this->emulate($device, $output);
                 }
 
                 $this->entityManager->flush();
@@ -112,13 +111,107 @@ class EmulatorCommand extends Command
 
         /** @var Device $device */
         foreach ($query->getQuery()->getResult() as $device) {
-            $this->emulate($device);
+            $this->emulate($device, $output);
         }
 
         $this->entityManager->flush();
     }
 
-    private function emulate(Device $device) {
+    /**
+     * @param Device $device
+     * @param OutputInterface $output
+     */
+    private function emulate(Device $device, OutputInterface $output) {
+
+        $tracker = $device->getTracker();
+
+        if ($tracker->getEmulatedData('count') === null) {
+
+            //$output->writeln(sprintf('Initiating emulation for device "%s".', $device->getName()));
+
+            $tracker->setEmulatedData('count', 0);
+
+            # randomize the starting location a bit
+            $location = $this->cities[rand(0,9)];
+
+            $location[0] += rand(0,50) * 0.1;
+            $location[1] += rand(0,50) * 0.1;
+
+            $tracker->setEmulatedData('latitude', $location[0]);
+            $tracker->setEmulatedData('longitude', $location[1]);
+
+            # add some start telemetry
+            $tracker->setEmulatedData('temperature', [
+                'value'     => rand(0, 25),
+                'min'       => -20,
+                'max'       => 60,
+                'modifier'  => 0.1
+            ]);
+            $tracker->setEmulatedData('humidity', [
+                'value'     => rand(10, 95),
+                'min'       => 0,
+                'max'       => 100,
+                'modifier'  => 0.1
+            ]);
+        }
+
+        $output->writeln(sprintf('Emulating telemetry for device "%s".', $device->getName()));
+
+        $latitude = $tracker->getEmulatedData('latitude');
+
+        $m = rand(0,1) === 0 ? -0.01 : 0.01;
+
+        $tracker->setEmulatedData('latitude', $latitude + (rand(0,10) * $m));
+
+        $longitude = $tracker->getEmulatedData('longitude');
+
+        $m = rand(0,1) === 0 ? -0.01 : 0.01;
+
+        $tracker->setEmulatedData('longitude', $longitude + (rand(0,10) * $m));
+
+        $p = $tracker->getEmulatedData('temperature');
+
+        # slight chance to change the trend
+        if ($p['modifier'] >= 0) {
+            $p['modifier'] = rand(0,10) === 0 ? -0.1 : 0.1;
+        } else {
+            $p['modifier'] = rand(0,10) === 0 ? 0.1 : -0.1;
+        }
+
+        $v = (float) $p['value'] + (rand(0,5) * $p['modifier']);
+
+        if ($v >= $p['min'] && $v <= $p['max']) {
+            $p['value'] = $v;
+        }
+
+        $tracker->setEmulatedData('temperature', $p);
+
+        $p = $tracker->getEmulatedData('humidity');
+
+        if ($p['modifier'] >= 0) {
+            $p['modifier'] = rand(0,10) === 0 ? -0.1 : 0.1;
+        } else {
+            $p['modifier'] = rand(0,10) === 0 ? 0.1 : -0.1;
+        }
+
+        $v = (float) $p['value'] + (rand(0,5) * $p['modifier']);
+
+        if ($v >= $p['min'] && $v <= $p['max']) {
+            $p['value'] = $v;
+        }
+
+        $tracker->setEmulatedData('humidity', $p);
+
+        $t = new SimpleTelemetry($device);
+
+        $t->setLatitude($tracker->getEmulatedData('latitude'));
+        $t->setLongitude($tracker->getEmulatedData('longitude'));
+        $t->setTemperature($tracker->getEmulatedData('temperature')['value']);
+        $t->setHumidity($tracker->getEmulatedData('humidity')['value']);
+
+        $this->entityManager->persist($t);
+
+        $tracker->setEmulatedData('count', ($tracker->getEmulatedData('count') + 1));
 
     }
 

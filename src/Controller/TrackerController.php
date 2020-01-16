@@ -109,14 +109,13 @@ class TrackerController extends BaseController
         EntityManagerInterface $entityManager,
         FormFactoryInterface $formFactory,
         FlashBagInterface $flashBag,
-        UserPasswordEncoderInterface $passwordEncoder,
         ProjectionService $projectionService,
         Tracker $entity
     ): Response
     {
         $this->addBreadcrumb($this->generateUrl('tracker_edit', ['id' => $entity->getId()]), sprintf('%s', $entity->getName()));
 
-        $form = $formFactory->createNamed('', Tracker::class, $projectionService->getProjection($entity));
+        $form = $formFactory->createNamed('', TrackerEditType::class, $projectionService->getProjection($entity));
 
         $form->handleRequest($request);
 
@@ -137,5 +136,25 @@ class TrackerController extends BaseController
             'breadcrumbs'   => $this->getBreadcrumbs(),
             'form'          => $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/{id}/emulator/reset", name="tracker_emulator_reset", requirements={"id"="^[a-f0-9\-]+$"}, methods="GET|POST")
+     * @ParamConverter("tracker")
+     */
+    public function emulatorReset(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        FlashBagInterface $flashBag,
+        Tracker $entity
+    ): Response
+    {
+
+        $entity->resetEmulator();
+        $entityManager->flush();
+
+        $flashBag->add('success', sprintf('Zresetowano emulator urządzenia "%s".', $entity->getDevice()->getName()));
+
+        return $this->redirectToRoute('tracker_edit', ['id' => $entity->getId()]);
     }
 }

@@ -62,7 +62,7 @@ class SimpleTelemetry implements TelemetryInterface
      *      min = 0,
      *      max = 100
      * )
-     * @Projection(type="integer")
+     * @Projection(type="float")
      * @Groups({"Mercure"})
      */
     private $humidity;
@@ -74,7 +74,7 @@ class SimpleTelemetry implements TelemetryInterface
      *      min = -50,
      *      max = 100
      * )
-     * @Projection(type="integer")
+     * @Projection(type="float")
      * @Groups({"Mercure"})
      */
     private $temperature;
@@ -86,6 +86,7 @@ class SimpleTelemetry implements TelemetryInterface
      * @Groups({"Mercure"})
      */
     private $device;
+
 
     public function __construct(Device $device)
     {
@@ -116,7 +117,7 @@ class SimpleTelemetry implements TelemetryInterface
      */
     public function getLatitude(): ?float
     {
-        return $this->latitude + (rand(0,100)/1000);
+        return (float) $this->latitude;
     }
 
     /**
@@ -134,7 +135,7 @@ class SimpleTelemetry implements TelemetryInterface
      */
     public function getLongitude(): ?float
     {
-        return $this->longitude + (rand(0,100)/1000);
+        return (float) $this->longitude;
     }
 
     /**
@@ -148,36 +149,36 @@ class SimpleTelemetry implements TelemetryInterface
     }
 
     /**
-     * @return int|null
+     * @return float|null
      */
-    public function getHumidity(): ?int
+    public function getHumidity(): ?float
     {
-        return $this->humidity;
+        return (float) $this->humidity;
     }
 
     /**
-     * @param int|null $humidity
+     * @param float|null $humidity
      * @return SimpleTelemetry
      */
-    public function setHumidity(?int $humidity): SimpleTelemetry
+    public function setHumidity(?float $humidity): SimpleTelemetry
     {
         $this->humidity = $humidity;
         return $this;
     }
 
     /**
-     * @return int|null
+     * @return float|null
      */
-    public function getTemperature(): ?int
+    public function getTemperature(): ?float
     {
-        return $this->temperature;
+        return (float) $this->temperature;
     }
 
     /**
-     * @param int|null $temperature
+     * @param float|null $temperature
      * @return SimpleTelemetry
      */
-    public function setTemperature(?int $temperature): SimpleTelemetry
+    public function setTemperature(?float $temperature): SimpleTelemetry
     {
         $this->temperature = $temperature;
         return $this;

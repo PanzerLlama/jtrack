@@ -70,11 +70,7 @@ class Tracker
      * @var array
      * @ORM\Column(type="json")
      */
-    private $emulatorData = [
-        'latitude'  => null,
-        'longitude' => null,
-        'count'     => 0
-    ];
+    private $emulatorData = [];
 
     /**
      * @var Device|null
@@ -85,6 +81,7 @@ class Tracker
     public function __construct()
     {
         $this->created = new \DateTime();
+        $this->resetEmulator();
     }
 
     public function __toString()
@@ -183,10 +180,28 @@ class Tracker
     }
 
     /**
-     * @param string $property
-     * @return string|null
+     * @return array
      */
-    public function getEmulatorData(string $property): ?string
+    public function getEmulatorData(): array
+    {
+        return $this->emulatorData;
+    }
+
+    /**
+     * @param array $emulatorData
+     * @return Tracker
+     */
+    public function setEmulatorData(array $emulatorData): Tracker
+    {
+        $this->emulatorData = $emulatorData;
+        return $this;
+    }
+
+    /**
+     * @param string $property
+     * @return mixed|null
+     */
+    public function getEmulatedData(string $property)
     {
         if (isset($this->emulatorData[$property])) {
             return $this->emulatorData[$property];
@@ -196,16 +211,29 @@ class Tracker
 
     /**
      * @param string $property
-     * @param string $value
+     * @param $value
      * @return Tracker
      */
-    public function setEmulatorData(string $property, string $value): Tracker
+    public function setEmulatedData(string $property, $value): Tracker
     {
         if (!isset($this->emulatorData[$property])) {
             $this->emulatorData[$property] = null;
         }
 
         $this->emulatorData[$property] = $value;
+        return $this;
+    }
+
+    /**
+     * @return Tracker
+     */
+    public function resetEmulator(): Tracker
+    {
+        $this->setEmulatorData([
+            'latitude'  => null,
+            'longitude' => null,
+            'count'     => null
+        ]);
         return $this;
     }
 
