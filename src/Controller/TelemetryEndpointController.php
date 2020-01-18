@@ -52,6 +52,8 @@ class TelemetryEndpointController extends AbstractController
             return new Response('ERROR', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+        $device->setStampActivity(new \DateTime());
+
         $entityManager->persist($telemetry);
         $entityManager->flush();
 

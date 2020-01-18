@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 
+use App\Entity\Device;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -22,13 +24,25 @@ class AppController extends BaseController
 
     /**
      * @Route("", name="app_index")
-     *
      * @Template()
      */
     public function index()
     {
         return [
 
+            ] + $this->getResponseArray();
+    }
+
+    /**
+     * @Route("telemetry/{id}", name="device_telemetry", requirements={"id"="^[a-f0-9\-]+$"}, methods="GET")
+     * @ParamConverter("device")
+     * @Template()
+     */
+    public function deviceTelemetry(Device $device)
+    {
+
+        return [
+            'device' => $device
             ] + $this->getResponseArray();
     }
 }

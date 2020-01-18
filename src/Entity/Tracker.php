@@ -184,6 +184,9 @@ class Tracker
      */
     public function getEmulatorData(): array
     {
+        if (!is_array($this->emulatorData)) {
+            $this->resetEmulator();
+        }
         return $this->emulatorData;
     }
 

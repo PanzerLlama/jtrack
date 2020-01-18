@@ -94,11 +94,13 @@ class EmulatorCommand extends Command
 
         if (isset($sleep)) {
             do {
-                $output->writeln(sprintf('Loading devices with emulated trackers.'));
+                //$output->writeln(sprintf('Loading devices with emulated trackers.'));
 
                 /** @var Device $device */
                 foreach ($query->getQuery()->getResult() as $device) {
                     $this->emulate($device, $output);
+
+                    $device->setStampActivity(new \DateTime());
                 }
 
                 $this->entityManager->flush();
@@ -134,8 +136,8 @@ class EmulatorCommand extends Command
             # randomize the starting location a bit
             $location = $this->cities[rand(0,9)];
 
-            $location[0] += rand(0,50) * 0.1;
-            $location[1] += rand(0,50) * 0.1;
+            $location[0] += rand(0,50) * 0.001;
+            $location[1] += rand(0,50) * 0.001;
 
             $tracker->setEmulatedData('latitude', $location[0]);
             $tracker->setEmulatedData('longitude', $location[1]);
@@ -157,6 +159,7 @@ class EmulatorCommand extends Command
 
         $output->writeln(sprintf('Emulating telemetry for device "%s".', $device->getName()));
 
+        /*
         $latitude = $tracker->getEmulatedData('latitude');
 
         $m = rand(0,1) === 0 ? -0.01 : 0.01;
@@ -168,6 +171,7 @@ class EmulatorCommand extends Command
         $m = rand(0,1) === 0 ? -0.01 : 0.01;
 
         $tracker->setEmulatedData('longitude', $longitude + (rand(0,10) * $m));
+        */
 
         $p = $tracker->getEmulatedData('temperature');
 

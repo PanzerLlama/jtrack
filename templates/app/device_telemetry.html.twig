@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+{% block css %}
+<link rel="stylesheet" href="{{ asset('chart-js/Chart.min.css') }}" type="text/css">
+{% endblock %}
+{% block js %}
+<script src="{{ asset('chart-js/Chart.min.js') }}"></script>
+<script type="text/javascript">
+
+  var ctx = $('#chart');
+
+  var lineChart = new Chart(ctx, {
+    "type": "line",
+    "data": {
+      "labels":   {{ device|getChartData()|json_encode|raw }},
+      "datasets": [
+        {
+          "label": "Wilgotność",
+          "data": {{ device|getChartData('humidity')|json_encode|raw }},
+          "fill": false,
+          "borderColor": "rgb(0, 128, 255)",
+          "lineTension": 0.1
+        }, {
+          "label": "Temperatura",
+          "data": {{ device|getChartData('temperature')|json_encode|raw }},
+          "fill": false,
+          "borderColor": "rgb(255, 128, 0)",
+          "lineTension": 0.1
+        }
+      ]
+    },
+    "options": {}
+  });
+</script>
+{% endblock %}
+{% block body %}
+<div class="container mx-auto py-8">
+  <h5 class="border-b-2 mb-5">{{ device.name }}</h5>
+  <p>Ostatnia aktywność: {{ device.stampActivity.format('Y/m/d @ H:i:s')|default('brak') }}</p>
+  <canvas id="chart" class="border w-full mt-5" style="height: 400px;"></canvas>
+</div>
+{% endblock %}

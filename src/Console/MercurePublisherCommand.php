@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace App\Console;
 
 
+use App\Entity\Device;
 use App\Entity\SimpleTelemetry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
@@ -64,6 +66,9 @@ class MercurePublisherCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /*
+         * Native query is much more useful
+         *
         $queryBuilder = $this->entityManager->createQueryBuilder();
 
         $query = $queryBuilder
@@ -75,25 +80,44 @@ class MercurePublisherCommand extends Command
             ->groupBy('t.device_id');
 
         //echo $query->getQuery()->getSql(); exit;
+        */
+
+        $sql = 'SELECT st1.*, d1.name, d1.color, d1.created AS created2, d1.enabled FROM simple_telemetry AS st1 LEFT JOIN device d1 ON d1.id = st1.device_id
+                INNER JOIN (
+                    SELECT MAX(id) AS id, device_id FROM simple_telemetry GROUP BY device_id
+                ) st2 ON st1.id = st2.id';
+
+        $resultSetMapping = new ResultSetMapping();
+
+        $resultSetMapping->addEntityResult(SimpleTelemetry::class, 'st1');
+        $resultSetMapping->addFieldResult('st1', 'id', 'id');
+        $resultSetMapping->addFieldResult('st1', 'latitude', 'latitude');
+        $resultSetMapping->addFieldResult('st1', 'longitude', 'longitude');
+        $resultSetMapping->addFieldResult('st1', 'temperature', 'temperature');
+        $resultSetMapping->addFieldResult('st1', 'humidity', 'humidity');
+        $resultSetMapping->addFieldResult('st1', 'created', 'created');
+        $resultSetMapping->addJoinedEntityResult(Device::class, 'd1', 'st1', 'device');
+        $resultSetMapping->addFieldResult('d1', 'device_id', 'id');
+        $resultSetMapping->addFieldResult('d1', 'name', 'name');
+        $resultSetMapping->addFieldResult('d1', 'color', 'color');
+        $resultSetMapping->addFieldResult('d1', 'created2', 'created');
+        $resultSetMapping->addFieldResult('d1', 'enabled', 'enabled');
+
+        $query = $this->entityManager->createNativeQuery($sql, $resultSetMapping);
+
 
         $sleep = (int) ($input->getOption('frequency') * 1000000);
 
         do {
-
-            $stamp = new \DateTime();
-
-            $stamp->modify(sprintf('-%s seconds', $input->getOption('frequency')));
-
-            $query->setParameter('created', $stamp);
-
-            $output->writeln(sprintf('Fetching records - %s.', $stamp->format('Y-m-d@H:i:s')));
-
             /** @var SimpleTelemetry $record */
-            foreach ($query->getQuery()->getResult() as $record) {
+            foreach ($query->getResult() as $record) {
 
                 $payload = $this->serializer->serialize(
                     $record,
-                    'json', ['groups' => 'Mercure']
+                    'json', [
+                        'groups'            => 'Mercure',
+                        'datetime_format'   => 'Y/m/d @ H:i:s'
+                    ]
                 );
 
                 $output->writeln($payload);

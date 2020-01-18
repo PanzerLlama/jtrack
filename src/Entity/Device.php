@@ -56,6 +56,12 @@ class Device
      */
     private $tracker;
 
+    /**
+     * @var \DateTime|null
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $stampActivity;
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -143,6 +149,24 @@ class Device
         if ($tracker) {
             $tracker->setDevice($tracker ? $this : null);
         }
+        return $this;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getStampActivity(): ?\DateTime
+    {
+        return $this->stampActivity;
+    }
+
+    /**
+     * @param \DateTime|null $stampActivity
+     * @return Device
+     */
+    public function setStampActivity(?\DateTime $stampActivity): Device
+    {
+        $this->stampActivity = $stampActivity;
         return $this;
     }
 
