@@ -23,8 +23,11 @@
     view: new ol.View({
       center: ol.proj.fromLonLat([20, 52]),
       zoom: 7
-    })
+    }),
   });
+
+  var ctrlSlider= new ol.control.ZoomSlider();
+  map.addControl(ctrlSlider);
 
   var markers = [];
   var features = [];
@@ -98,6 +101,7 @@
 
         $('#t-device-' + data.device.id + ' .fa-bullseye').click(function() {
           map.getView().setCenter(ol.proj.transform([data.longitude, data.latitude], 'EPSG:4326', 'EPSG:3857'));
+          map.getView().setZoom(14);
         });
       });
 
@@ -114,9 +118,9 @@
 
       $('#t-device-' + data.device.id + ' .fa-bullseye').click(function() {
         map.getView().setCenter(ol.proj.transform([data.longitude, data.latitude], 'EPSG:4326', 'EPSG:3857'));
+        map.getView().setZoom(14);
       });
     }
-
   }
 
 </script>
