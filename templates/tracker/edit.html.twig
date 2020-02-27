@@ -16,10 +16,10 @@
         <div class="w-1/2">
             {{ form(form) }}
         </div>
-        {% if entity.flagEmulated %}
+        {% if entity and entity.flagEmulated %}
         <div class="w-1/2 p-5">
             <p class="pb-2">Dane emulatora:</p>
-            {{ dump(entity.emulatorData()) }}
+            {{ entity.emulatorData()|json_encode }}
             <p class="pt-5"><a href="{{ path('tracker_emulator_reset', { id: entity.id }) }}">Resetuj</a></p>
         </div>
         {% endif %}

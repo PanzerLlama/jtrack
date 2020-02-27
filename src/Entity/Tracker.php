@@ -37,7 +37,7 @@ class Tracker
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Projection()
+     * @Projection(readOnly=true)
      * @Groups({"Mercure"})
      */
     private $id;
@@ -95,16 +95,6 @@ class Tracker
     public function getId(): int
     {
         return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return Tracker
-     */
-    public function setId(int $id): Tracker
-    {
-        $this->id = $id;
-        return $this;
     }
 
     /**

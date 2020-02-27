@@ -54,11 +54,7 @@ class ProjectionService
                 return [];
             }
         } else {
-            try {
-                $reflectionClass = new \ReflectionClass($class);
-            } catch (\ReflectionException $e) {
-                return [];
-            }
+            return [];
         }
 
         foreach ($reflectionClass->getProperties() as $property) {
@@ -106,6 +102,10 @@ class ProjectionService
             );
 
             if ($annotation) {
+
+                if ($annotation->isReadOnly()) {
+                    continue;
+                }
 
                 $setter = 'set'.ucfirst($propertyName);
 

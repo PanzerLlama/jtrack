@@ -28,6 +28,11 @@ class Projection
     public $groups = [];
 
     /**
+     * @var bool
+     */
+    public $readOnly = false;
+
+    /**
      * @return string|null
      */
     public function getType(): ?string
@@ -62,4 +67,23 @@ class Projection
         $this->groups = $groups;
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function isReadOnly(): bool
+    {
+        return $this->readOnly;
+    }
+
+    /**
+     * @param bool $readOnly
+     * @return Projection
+     */
+    public function setReadOnly(bool $readOnly): Projection
+    {
+        $this->readOnly = $readOnly;
+        return $this;
+    }
+
 }

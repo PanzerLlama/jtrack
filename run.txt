@@ -1,3 +1,6 @@
  npx tailwind build assets/styles/tailwind.pcss -o public/css/site.css
 
  ./mercure/mercure --jwt-key='71692F657282C11C3B1683268D276' --addr='127.0.0.1:3000' --allow-anonymous --cors-allowed-origins='*'
+
+
+ mercure --jwt-key='71692F657282C11C3B1683268D276' --addr='jtrack.dry-pol.pl:3000' --allow-anonymous --cors-allowed-origins='*'
