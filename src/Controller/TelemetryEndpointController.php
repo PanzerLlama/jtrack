@@ -41,9 +41,17 @@ class TelemetryEndpointController extends AbstractController
      */
     public function TelemetryEndpoint(Request $request, EntityManagerInterface $entityManager, TelemetryCreator $creator, Device $device, string $controlHash)
     {
-        if (md5(sprintf('%s:%s', $device->getSecret(), $request->getQueryString())) !== $controlHash) {
-            echo md5(sprintf('%s:%s', $device->getSecret(), $request->getQueryString()));
-            throw new HttpException(400, 'Invalid signature.');
+        $query = explode('?', $_SERVER['REQUEST_URI']);
+
+        $query = end($query);
+
+        $md5 = md5(sprintf('%s:%s', $device->getTracker()->getSecret(), $query));
+
+        if ($md5 !== $controlHash) {
+            //echo md5(sprintf('%s:%s', $device->getTracker()->getSecret(), $request->getQueryString()));
+            throw new HttpException(400,
+                sprintf('Invalid signature. Query string: %s, key: %s, md5: %s.', $query, sprintf('%s:%s', $device->getTracker()->getSecret(), $query), $md5)
+            );
         }
 
         try {

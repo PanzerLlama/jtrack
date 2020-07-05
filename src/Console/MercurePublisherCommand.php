@@ -105,7 +105,6 @@ class MercurePublisherCommand extends Command
 
         $query = $this->entityManager->createNativeQuery($sql, $resultSetMapping);
 
-
         $sleep = (int) ($input->getOption('frequency') * 1000000);
 
         do {

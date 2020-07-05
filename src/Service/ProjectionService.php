@@ -12,6 +12,7 @@ namespace App\Service;
 
 use App\Annotations\Projection;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Persistence\Proxy;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ProjectionService
@@ -47,9 +48,13 @@ class ProjectionService
 
         $reader = new AnnotationReader();
 
-        if ($this->entityManager->getMetadataFactory()->isTransient($subject)) {
+        if (is_object($subject)) {
+            $className = ($subject instanceof Proxy) ? get_parent_class($subject) : get_class($subject);
+        }
+
+        if (1 || $this->entityManager->getMetadataFactory()->isTransient($className)) {
             try {
-                $reflectionClass = new \ReflectionClass($this->entityManager->getClassMetadata(get_class($subject))->getName());
+                $reflectionClass = new \ReflectionClass($this->entityManager->getClassMetadata($className)->getName());
             } catch (\ReflectionException $e) {
                 return [];
             }
@@ -119,7 +124,7 @@ class ProjectionService
 
                     $subject->$setter($projection[$propertyName]);
                 } else {
-                    $subject->$setter(null);
+                    //$subject->$setter(null);
                 }
             }
         }

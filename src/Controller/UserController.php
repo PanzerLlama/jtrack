@@ -84,6 +84,8 @@ class UserController extends BaseController
 
             $projectionService->updateModelFromProjection($user, $data);
 
+            $user->setRoles(['ROLE_USER']);
+
             if ($user->getPlainPassword()) {
                 $user->setPassword($passwordEncoder->encodePassword($user, $user->getPlainPassword()));
             }
@@ -133,7 +135,6 @@ class UserController extends BaseController
                 $user->setPassword($passwordEncoder->encodePassword($user, $user->getPlainPassword()));
             }
 
-            //$entityManager->persist($user);
             $entityManager->flush();
 
             $flashBag->add('success', sprintf('Uaktualniono użytkownika "%s".', $data['email']));

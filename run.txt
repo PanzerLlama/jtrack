@@ -4,3 +4,7 @@
 
 
  mercure --jwt-key='71692F657282C11C3B1683268D276' --addr='jtrack.dry-pol.pl:3000' --allow-anonymous --cors-allowed-origins='*'
+
+http://jtrack.dry-pol.pl/telemetry/store/P02/340a9fb37524675ac95093fb25fdee27?latitude=20.966560&longitude=52.415261&temperature=21.40&humidity=47.00
+http://jtrack.dry-pol.pl/telemetry/store/P02/4f6b3d97b75d1a230c43966f41851276?latitude=20.966560&longitude=52.415261&temperature=21.30&humidity=47.40
+http://jtrack.dry-pol.pl/telemetry/store/P02/340a9fb37524675ac95093fb25fdee27?latitude=20.966560&longitude=52.415261&temperature=21.40&humidity=47.00
